@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Minesweeper developed by Victor Tamayo Viera by scracth using javascript">
+    <title>Minesweeper</title>
+    <link id="style" rel="stylesheet" href="https://unpkg.com/xp.css">
+    <link rel="icon" href="minesweeperAssets/icon.webp">
+    <style>
+        * {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html,
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 10px;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('minesweeperAssets/XPbackground.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        #window {
+            position: absolute;
+        }
+
+        .title-bar-text {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .title-bar-icon {
+            height: 20px;
+            align-self: center;
+            margin-right: 5px;
+        }
+
+        .window-body {
+            display: flex;
+            flex-direction: row;
+            /*IF ROW
+            gap: 0.5rem;
+            */
+            /*IF COLUMN
+            gap: 1rem;
+            */
+            gap: 0.5rem;
+        }
+
+        /* IF ROW
+        article {
+            width: 42rem;
+        }
+        */
+
+        article {
+            width: 25rem;
+        }
+
+        #creditsTab * {
+            -moz-user-select: text;
+            -khtml-user-select: text;
+            -webkit-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        .game {
+            /*width: 50rem;*/
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            background: #C0C0C0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-top: 0.5rem #7B7B7B solid;
+            border-left: 0.5rem #7B7B7B solid;
+            border-right: 0.5rem white solid;
+            border-bottom: 0.5rem white solid;
+        }
+
+        .counter {
+            display: flex;
+            padding: 0.3rem;
+            gap: 0.3rem;
+            background: black;
+            border-top: 0.3rem #7B7B7B solid;
+            border-left: 0.3rem #7B7B7B solid;
+            border-right: 0.3rem white solid;
+            border-bottom: 0.3rem white solid;
+
+        }
+
+        .counter,
+        img {
+            height: 4rem
+        }
+
+        #face {
+            height: 5rem;
+        }
+
+        #face:hover {
+            cursor: pointer;
+        }
+
+        main {
+            display: flex;
+            border-top: 0.5rem #7B7B7B solid;
+            border-left: 0.5rem #7B7B7B solid;
+            border-right: 0.5rem white solid;
+            border-bottom: 0.5rem white solid;
+        }
+
+        #gameGrid {
+            width: 100%;
+            background: #7B7B7B;
+        }
+
+        #gameGrid td {
+            padding: 0;
+            height: 3rem;
+            background-color: #C6C6C6;
+            background-size: cover;
+            background-position: -1px;
+            border-top: 0.5rem white solid;
+            border-left: 0.5rem white solid;
+            border-right: 0.5rem #7B7B7B solid;
+            border-bottom: 0.5rem #7B7B7B solid;
+        }
+
+        #gameGrid td:hover {
+            cursor: pointer;
+        }
+
+        .noPointer {
+            cursor: default !important;
+        }
+
+        #gameGrid .pressing {
+            border-top: 0.5rem #7B7B7B solid;
+            border-left: 0.5rem #7B7B7B solid;
+            border-right: 0.5rem #535353 solid;
+            border-bottom: 0.5rem #535353 solid;
+        }
+
+        #gameGrid .pressed {
+            border-top: 0.5rem #C6C6C6 solid;
+            border-left: 0.5rem #C6C6C6 solid;
+            border-right: 0.5rem #C6C6C6 solid;
+            border-bottom: 0.5rem #C6C6C6 solid;
+        }
+
+        /*Icons*/
+        .d1 {
+            background-image: url("minesweeperAssets/type1.svg")
+        }
+
+        .d2 {
+            background-image: url("minesweeperAssets/type2.svg")
+        }
+
+        .d3 {
+            background-image: url("minesweeperAssets/type3.svg")
+        }
+
+        .d4 {
+            background-image: url("minesweeperAssets/type4.svg")
+        }
+
+        .d5 {
+            background-image: url("minesweeperAssets/type5.svg")
+        }
+
+        .d6 {
+            background-image: url("minesweeperAssets/type6.svg")
+        }
+
+        .d7 {
+            background-image: url("minesweeperAssets/type7.svg")
+        }
+
+        .d8 {
+            background-image: url("minesweeperAssets/type8.svg")
+        }
+
+        .flag {
+            background-image: url("minesweeperAssets/flag.svg")
+        }
+
+        .mine {
+            background-image: url("minesweeperAssets/mine.svg")
+        }
+
+        #gameGrid .flagRed {
+            background-image: url("minesweeperAssets/mine_wrong.svg")
+        }
+
+        #gameGrid .mineRed {
+            background-image: url("minesweeperAssets/mine_red.svg");
+            /*
+            #FFA0A0
+            */
+            border-top: 0.5rem red solid;
+            border-left: 0.5rem red solid;
+            border-right: 0.5rem red solid;
+            border-bottom: 0.5rem red solid;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="window" class="window">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img class="title-bar-icon" src="minesweeperAssets/icon.webp" alt="icon">
+                <p>MineSweeper</p>
+            </div>
+            <div class="title-bar-controls">
+                <button id="configure" aria-label="Help"></button>
+                <button aria-label="Close"></button>
+            </div>
+
+        </div>
+        <div class="window-body">
+            <div id="menu">
+                <menu role="tablist">
+                    <button id="theme">Theme</button>
+                    <button id="grid">Grid</button>
+                    <button id="leader">leaderboard</button>
+                    <button id="credits">Credits</button>
+                </menu>
+                <article role="tabpanel" id="themeTab">
+                    <p>Theme selection</p>
+                    <fieldset>
+                        <legend>Options</legend>
+                        <div class="field-row">
+                            <input id="theme1" type="radio" name="themes">
+                            <label for="theme1">Windows XP</label>
+                        </div>
+                        <div class="field-row">
+                            <input id="theme2" type="radio" name="themes">
+                            <label for="theme2">Windows 98</label>
+                        </div>
+                        <div class="field-row">
+                            <input disabled id="theme3" type="radio" name="themes">
+                            <label for="theme3">Coming soon...</label>
+                        </div>
+                        <div class="field-row">
+                            <input disabled id="theme4" type="radio" name="themes">
+                            <label for="theme4">Coming soon...</label>
+                        </div>
+                    </fieldset>
+                </article>
+
+                <article role="tabpanel" id="gridTab">
+                    <p>Grid configuration</p>
+                    <fieldset>
+                        <legend>Options</legend>
+                        <div class="field-row">
+                            <label for="totalMines">Mines:</label>
+                            <input id="totalMines" type="number" />
+                        </div>
+                        <br><br>
+                        <div class="field-row" style="width: 200px">
+                            <label>Grid complexity:</label>
+                            <select id="gridComplexity">
+                                <option value="6">Very low [6 x 6]</option>
+                                <option value="10">Low [10 x 10]</option>
+                                <option value="14">Medium [14 x 14]</option>
+                                <option value="20">High [20 x 20]</option>
+                                <option value="25">Very high [25 x 25]</option>
+                            </select>
+                        </div>
+                        <br><br>
+                        <div class="field-row" style="width: 200px">
+                            <label>Mine probability:</label>
+                            <label>Low</label>
+                            <input id="mineProbability" type="range" min="1" max="5" />
+                            <label>High</label>
+                        </div>
+                    </fieldset>
+                </article>
+
+                <article role="tabpanel" id="leaderTab">
+                    <h3>Working on it</h3>
+                    <?php include("minesweeer.php") ?>
+                </article>
+
+                <article role="tabpanel" id="creditsTab">
+                    <p>
+                        Minesweeper website: Victor Tamayo Viera
+                        <br>email me at <a>tamayo.viera.victor@alumnat.copernic.cat</a> for more project ideas.
+                        <br>
+                        <br>Game images: <a target="_blank"
+                            href="https://minesweeper.online/es/game/1757710109">Minesweeper Online</a>
+                        <br>
+                        <br>Windows XP design: Jordan Scales (<a target="_blank"
+                            href="https://botoxparty.github.io/XP.css/">github</a>).
+                    </p>
+                </article>
+                <section class="field-row" style="justify-content: flex-end">
+                    <button id="Ok">OK</button>
+                    <button id="Cancel">Cancel</button>
+                </section>
+            </div>
+            <div id="game" class="game">
+                <header>
+                    <div class="counter" id="mineCount">
+                        <div>
+                            <img id="c1" src="minesweeperAssets/d0.svg" alt="digit1 of mine-counter">
+                        </div>
+                        <div>
+                            <img id="c2" src="minesweeperAssets/d0.svg" alt="digit2 of mine-counter">
+                        </div>
+                        <div>
+                            <img id="c3" src="minesweeperAssets/d0.svg" alt="digit3 of mine-counter">
+                        </div>
+                    </div>
+
+                    <div>
+                        <img id="face" src="minesweeperAssets/face_unpressed.svg" alt="face button">
+                    </div>
+
+                    <div class="counter" id="timer">
+                        <div>
+                            <img id="t1" src="minesweeperAssets/d0.svg" alt="digit1 of timer">
+                        </div>
+                        <div>
+                            <img id="t2" src="minesweeperAssets/d0.svg" alt="digit1 of timer">
+                        </div>
+                        <div>
+                            <img id="t3" src="minesweeperAssets/d0.svg" alt="digit1 of timer">
+                        </div>
+                    </div>
+                </header>
+                <main id="main"></main>
+            </div>
+        </div>
+    </div>
+    <!--Config menu function-->
+    <script>
+        // Show/Hide content
+        function hideContent() {
+            theme.ariaSelected = false;
+            grid.ariaSelected = false;
+            leader.ariaSelected = false;
+            credits.ariaSelected = false;
+            themeTab.hidden = true;
+            gridTab.hidden = true;
+            leaderTab.hidden = true;
+            creditsTab.hidden = true;
+        }
+
+        function hideMenu() {
+            menu.hidden = true;
+        }
+
+        function show(tab, content) {
+            hideContent();
+            tab.ariaSelected = true;
+            content.hidden = false;
+        }
+
+        function changeTheme() {
+            if (document.getElementById('theme1').checked == true) {
+                style.href = 'https://unpkg.com/xp.css';
+                document.body.style.backgroundImage = 'url("minesweeperAssets/XPbackground.jpg")';
+            } else if (document.getElementById('theme2').checked == true) {
+                style.href = "https://unpkg.com/98.css";
+                document.body.style.backgroundImage = 'url("minesweeperAssets/98background.webp")';
+            }
+        }
+
+        // Variables
+        // Menu and tabs
+        var menu = document.getElementById('menu');
+        var theme = document.getElementById('theme');
+        var themeTab = document.getElementById('themeTab');
+        var grid = document.getElementById('grid');
+        var gridTab = document.getElementById('gridTab');
+        var leader = document.getElementById('leader');
+        var leaderTab = document.getElementById('leaderTab');
+        var credits = document.getElementById('credits');
+        var creditsTab = document.getElementById('creditsTab');
+        // Configurable items
+        var style = document.getElementById('style');
+        var mineTextbox = document.getElementById('totalMines');
+        var mineSlider = document.getElementById('mineProbability');
+        var gridSelect = document.getElementById('gridComplexity');
+
+        document.getElementById('theme1').checked = true;
+        mineTextbox.value = 30;
+        gridSelect.value = 10;
+        mineSlider.value = 2;
+        hideMenu();
+
+        // Event Listeners
+        document.getElementById('configure').addEventListener('click', event => {
+            if (menu.hidden) {
+                menu.hidden = false;
+                show(theme, themeTab);
+            } else {
+                hideMenu();
+            }
+        });
+
+        theme.addEventListener('click', event => show(theme, themeTab));
+        grid.addEventListener('click', event => show(grid, gridTab));
+        leader.addEventListener('click', event => show(leader, leaderTab));
+        credits.addEventListener('click', event => show(credits, creditsTab));
+
+        document.getElementById('Ok').addEventListener('click', event => changeTheme());
+        document.getElementById('Cancel').addEventListener('click', event => {
+            hideMenu();
+        });
+    </script>
+
+    <!--Draggable window function-->
+    <script>
+        dragElement(document.getElementById('window'));
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            document.getElementsByClassName('title-bar')[0].onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                
+                if(parseInt(elmnt.style.top) < 0) elmnt.style.top = "0px";
+                if(parseInt(elmnt.style.left) < -350) elmnt.style.left = "-350px";
+            }
+
+            function closeDragElement() {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+    </script>
+
+    <!--Main game function-->
+    <script>
+        // FUNCTIONS
+        {
+            // Useful functions
+            function changeFace(expression) {
+                face.src = `minesweeperAssets/face_${expression}.svg`;
+            }
+
+            function getInput() {
+                height = width = document.getElementById('gridComplexity').value;
+                totalMines = validate(document.getElementById('totalMines').value, 1, (height * width));
+                mineProbability = document.getElementById('mineProbability').value;
+            }
+
+            function getCell(x, y) {
+                return document.getElementById(`${x}|${y}`);
+            }
+
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            }
+
+            function validate(element, min, max) {
+                let value = 0;
+                if (element < 1 || element > max) alert('invalid input');
+                else value = element;
+                return value;
+            }
+
+            // Counters
+            function toggleTimer(action) {
+                clearInterval(interval);
+                if (action) interval = setInterval(displayTimer, 1000);
+            }
+
+            function displayTimer() {
+                timer[2]++;
+                if (timer[2] > 9) {
+                    timer[2] = 0;
+                    timer[1]++;
+                    if (timer[1] > 9) {
+                        timer[1] = 0;
+                        timer[0]++;
+                    }
+                }
+                document.getElementById('t1').src = `minesweeperAssets/d${timer[0]}.svg`;
+                document.getElementById('t2').src = `minesweeperAssets/d${timer[1]}.svg`;
+                document.getElementById('t3').src = `minesweeperAssets/d${timer[2]}.svg`;
+            }
+            
+            function displayMine() {
+                mines = [String(mineGen)[0], String(mineGen)[1], String(mineGen)[2]];
+                if (mineGen > 9 && mineGen < 100 || mineGen < -0 && mineGen > -10) {
+                    mines = ['0', mines[0], mines[1]]
+                }
+                else if (mineGen < 10 && mineGen >= 0) mines = ['0', '0', mines[0]];
+                document.getElementById('c1').src = `minesweeperAssets/d${mines[0]}.svg`;
+                document.getElementById('c2').src = `minesweeperAssets/d${mines[1]}.svg`;
+                document.getElementById('c3').src = `minesweeperAssets/d${mines[2]}.svg`;
+            }
+
+            // Click detection
+            var detectMouse = function (e, object, action) {
+                var e = e || window.event;
+                var btnCode;
+                if ('object' === typeof e) {
+                    btnCode = e.button;
+                    switch (btnCode) {
+                        case 0:
+                            if (!String(object.className).includes('flag')) {
+                                if (action == 'd') {
+                                    if (!String(object.className).includes('pressed')) {
+                                        object.className = 'pressing';
+                                    }
+                                }
+                                if (action == 'u') {
+                                    if (!String(object.className).includes('pressed')) {
+                                        check(object);
+                                    }
+                                }
+                            }
+                            break;
+                        case 1:
+                            console.log('Middle button clicked.');
+                            break;
+                        case 2:
+                            if (action == 'u') {
+                                if (object.className == 'flag') {
+                                    object.className = '';
+                                    mineGen++;
+                                    displayMine();
+                                } else if (object.className == '') {
+                                    object.className = 'flag';
+                                    mineGen--;
+                                    displayMine();
+                                    if (mineGen == 0) win();
+                                }
+                            }
+                            break;
+                        default:
+                            console.log('Unexpected code: ' + btnCode);
+                    }
+                }
+            }
+
+            // Generate game
+            function genGrid() {
+                const main = document.getElementsByTagName('main');
+                const table = document.createElement('table');
+                table.id = "gameGrid";
+                for (let y = 1; y <= height; y++) {
+                    const tr = document.createElement('tr');
+                    for (let x = 1; x <= width; x++) {
+                        const td = document.createElement('td');
+                        td.id = `${x}|${y}`;
+                        td.mine = false;
+                        td.blank = false;
+                        td.addEventListener('mousedown', function (event) { detectMouse(event, td, 'd') });
+                        td.addEventListener('mouseup', function (event) { detectMouse(event, td, 'u') });
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                    table.addEventListener('contextmenu', event => event.preventDefault());
+                }
+                document.getElementById('game').style.width = (36.08 + (38.66 * width) + "px");
+                main[0].innerHTML = '';
+                main[0].appendChild(table);
+                genExactMines();
+                displayMine();
+            }
+
+            function genExactMines() {
+                let cell, randomX, randomY;
+                while (mineGen < totalMines) {
+                    randomX = getRandomInt(1, (width));
+                    randomY = getRandomInt(1, (height));
+                    cell = getCell(randomX, randomY);
+                    if (!cell.mine) {
+                        cell.mine = true;
+                        mineGen++;
+                    }
+                }
+            }
+
+            function genRandomMines() {
+                let cells = document.querySelectorAll('td');
+                cells.forEach(cell => {
+                    if (getRandom(1, 10) <= mineProbability) cell.mine = true;
+                });
+            }
+
+            function genHybridMines() {
+                let cell, randomX, randomY;
+                for (let i = 0; i < (totalMines + getRandomInt(1, 9)); i++) {
+                    randomX = getRandom(1, width);
+                    randomY = getRandom(1, height);
+                    cell = getCell(randomX, randomY);
+                    if (!cell.mine) {
+                        cell.mine = true;
+                    }
+                }
+            }
+
+            // Cell inspector
+            function check(object) {
+                let mineCount = 0, coordenates = object.id.split('|');
+                let x = parseInt(coordenates[0]), y = parseInt(coordenates[1]);
+                let current;
+                // Check for mines in surrounding cells
+                if (object.mine == true) {
+                    toggleTimer(false);
+                    fail();
+                    object.className = 'noPointer mineRed';
+                } else {
+                    var checkX, checkY;
+                    var invalid = false;
+                    for (let i = -1; i < 2; i++) {
+                        checkY = y + i;
+                        if (checkY < 1 || checkY > height) {
+                            invalid = true;
+                        }
+                        for (let index = -1; index < 2 && !invalid; index++) {
+                            checkX = x + index;
+                            if (checkX > 0 && checkX <= width) {
+                                if (getCell(checkX, checkY).mine) {
+                                    mineCount++;
+                                }
+                            }
+                        }
+                        invalid = false
+                    }
+                    // Show number and Check for blank spaces
+                    if (mineCount > 0) {
+                        object.className += ' noPointer pressed d' + mineCount;
+                    } else {
+                        object.blank = true;
+                        for (let i = -1; i < 2; i++) {
+                            invalid = false;
+                            checkY = y + i;
+                            if (checkY < 1 || checkY > height) {
+                                invalid = true;
+                            }
+                            for (let index = -1; index < 2 && !invalid; index++) {
+                                checkX = x + index;
+                                if (checkX > 0 && checkX <= width) {
+                                    current = getCell(checkX, checkY);
+                                    if (!String(current.className).includes('flag')) current.className += ' noPointer pressed';
+                                    if (!current.blank) {
+                                        check(current);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Ending
+            function win() {
+                let cells = document.querySelectorAll('td');
+                let win = true;
+                cells.forEach(cell => {
+                    if (cell.mine && cell.className != 'flag') win = false;
+                });
+                if (win) {
+                    face.src = 'minesweeperAssets/face_win.svg';
+                    toggleTimer(false);
+                    cells.forEach(cell => {
+                        cell.addEventListener('mousedown', function (event) {
+                            event.stopImmediatePropagation();
+                        }, true);
+                        cell.addEventListener('mouseup', function (event) {
+                            event.stopImmediatePropagation();
+                        }, true);
+                        if (cell.className == '') check(cell);
+                        cell.className += ' noPointer';
+                    });
+                    console.log('crea ventana de victoria melon tontico de meirda q no te enteras de nah tonticoooo');
+                }
+            }
+            function fail() {
+                face.src = "minesweeperAssets/face_lose.svg";
+
+                // Get all cells
+                let cells = document.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.addEventListener('mousedown', function (event) {
+                        event.stopImmediatePropagation();
+                    }, true);
+                    cell.addEventListener('mouseup', function (event) {
+                        event.stopImmediatePropagation();
+                    }, true);
+                    // Show correspondig classes
+                    if (cell.mine) {
+                        if (cell.className != 'flag') cell.className += ' pressed mine';
+                    }
+                    if (cell.className == 'flag' && !cell.mine) cell.className = 'flagRed';
+                    cell.className += ' noPointer';
+                });
+            }
+
+            // Restart
+            function restart() {
+                mineGen = 0;
+                timer = [0, 0, -1];
+                genGrid();
+                toggleTimer(true);
+                displayTimer();
+            }
+        }
+
+        // TODO
+        {
+            // Variables
+            var mines = new Array(3), mineGen;
+            var face = document.getElementById("face");
+            var timer = new Array(3), interval;
+            var totalMines = 30, mineProbability = 0.2, height = 10, width = 10;
+
+            // Event Listeners
+            face.addEventListener("mousedown", event => changeFace('pressed'));
+            face.addEventListener("mouseup", event => {
+                changeFace('unpressed');
+                restart();
+            });
+            document.getElementById('Ok').addEventListener('click', event => {
+                getInput();
+                restart();
+            });
+
+            // Start game
+            getInput();
+            restart();
+        }
+    </script>
+</body>
+
+</html>
